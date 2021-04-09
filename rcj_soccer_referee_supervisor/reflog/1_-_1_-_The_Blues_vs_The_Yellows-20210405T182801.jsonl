@@ -1,0 +1,4 @@
+{"datetime": "2021-04-05T18:28:01.853063Z", "matchtime": 0, "event": "KICKOFF", "payload": {"robot_name": "B3", "team_name": "B"}}
+{"datetime": "2021-04-05T18:28:01.933112Z", "matchtime": 0, "event": "MATCH_START", "payload": {"score_yellow": 0, "score_blue": 0, "total_match_time": 600}}
+{"datetime": "2021-04-05T18:28:05.451185Z", "matchtime": 8.703999999995176, "event": "GOAL", "payload": {"team_name": "The Blues", "score_yellow": 0, "score_blue": 1}}
+{"datetime": "2021-04-05T18:28:06.534688Z", "matchtime": 9.727999999994609, "event": "KICKOFF", "payload": {"robot_name": "Y3", "team_name": "Y"}}

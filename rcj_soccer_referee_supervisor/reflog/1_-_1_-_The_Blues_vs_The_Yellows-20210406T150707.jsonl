@@ -1,0 +1,2 @@
+{"datetime": "2021-04-06T15:07:07.295017Z", "matchtime": 0, "event": "KICKOFF", "payload": {"robot_name": "Y3", "team_name": "Y"}}
+{"datetime": "2021-04-06T15:07:07.341385Z", "matchtime": 0, "event": "MATCH_START", "payload": {"score_yellow": 0, "score_blue": 0, "total_match_time": 600}}

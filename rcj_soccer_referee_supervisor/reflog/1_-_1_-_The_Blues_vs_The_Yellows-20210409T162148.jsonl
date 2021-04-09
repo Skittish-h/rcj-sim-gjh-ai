@@ -1,0 +1,4 @@
+{"datetime": "2021-04-09T16:21:48.135682Z", "matchtime": 0, "event": "KICKOFF", "payload": {"robot_name": "Y3", "team_name": "Y"}}
+{"datetime": "2021-04-09T16:21:48.182091Z", "matchtime": 0, "event": "MATCH_START", "payload": {"score_yellow": 0, "score_blue": 0, "total_match_time": 600}}
+{"datetime": "2021-04-09T16:21:51.455444Z", "matchtime": 3.1999999999982265, "event": "KICKOFF", "payload": {"robot_name": "Y3", "team_name": "Y"}}
+{"datetime": "2021-04-09T16:21:51.455444Z", "matchtime": 3.1999999999982265, "event": "KICKOFF", "payload": {"robot_name": "Y3", "team_name": "Y"}}

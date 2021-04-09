@@ -1,0 +1,9 @@
+{"datetime": "2021-04-09T16:31:13.936773Z", "matchtime": 0, "event": "KICKOFF", "payload": {"robot_name": "Y3", "team_name": "Y"}}
+{"datetime": "2021-04-09T16:31:13.955722Z", "matchtime": 0, "event": "MATCH_START", "payload": {"score_yellow": 0, "score_blue": 0, "total_match_time": 600}}
+{"datetime": "2021-04-09T16:31:22.694455Z", "matchtime": 27.519999999984748, "event": "GOAL", "payload": {"team_name": "The Yellows", "score_yellow": 1, "score_blue": 0}}
+{"datetime": "2021-04-09T16:31:23.857879Z", "matchtime": 30.52799999998308, "event": "KICKOFF", "payload": {"robot_name": "B3", "team_name": "B"}}
+{"datetime": "2021-04-09T16:31:30.897623Z", "matchtime": 57.151999999968325, "event": "INSIDE_PENALTY_FOR_TOO_LONG", "payload": {"type": "robot", "robot_name": "Y3"}}
+{"datetime": "2021-04-09T16:31:31.144196Z", "matchtime": 57.983999999967864, "event": "INSIDE_PENALTY_FOR_TOO_LONG", "payload": {"type": "robot", "robot_name": "Y1"}}
+{"datetime": "2021-04-09T16:31:32.342495Z", "matchtime": 61.823999999965736, "event": "LACK_OF_PROGRESS", "payload": {"type": "robot", "robot_name": "Y2"}}
+{"datetime": "2021-04-09T16:31:33.069183Z", "matchtime": 63.99999999996453, "event": "KICKOFF", "payload": {"robot_name": "Y3", "team_name": "Y"}}
+{"datetime": "2021-04-09T16:31:33.070180Z", "matchtime": 63.99999999996453, "event": "KICKOFF", "payload": {"robot_name": "Y3", "team_name": "Y"}}
