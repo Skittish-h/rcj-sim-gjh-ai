@@ -122,7 +122,7 @@ while 1:
     SIM_STEPS = 1000
 
     for i in range(SIM_STEPS):
-        print(i)
+        #print(i)
         env.step()
     
     

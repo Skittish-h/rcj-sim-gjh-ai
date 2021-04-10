@@ -17,7 +17,7 @@ class MyRobot1(RCJSoccerRobot):
 
                 while self.is_new_team_data():
                     team_data = self.get_new_team_data()
-                    print(team_data)
+                    #print(team_data)
                     # Do something with team data
 
                 # Get the position of our robot

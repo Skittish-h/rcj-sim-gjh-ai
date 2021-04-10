@@ -126,7 +126,7 @@ class RCJSoccerReferee(RCJSoccerSupervisor):
         # If a goal was scored, redraw the scores, set the timers, log what
         # happened and set the proper team for kickoff.
         if team_goal and team_kickoff:
-            self.draw_scores(self.score_blue, self.score_yellow)
+            #self.draw_scores(self.score_blue, self.score_yellow)
             self.ball_reset_timer = self.post_goal_wait_time
 
             self.eventer.event(
@@ -181,7 +181,7 @@ class RCJSoccerReferee(RCJSoccerSupervisor):
                 },
             )
 
-        self.time -= TIME_STEP / 1000.0
+            self.time -= TIME_STEP / 1000.0
 
         # On the very last tick, note that the match has finished
         if self.time < 0:
@@ -197,8 +197,8 @@ class RCJSoccerReferee(RCJSoccerSupervisor):
 
             return False
 
-        self.draw_time(self.time)
-        self.draw_event_messages()
+        #self.draw_time(self.time)
+        #self.draw_event_messages()
 
         # If we are currently not in the post-goal waiting period,
         # check if a goal took place, setup the waiting period and move the
@@ -208,15 +208,15 @@ class RCJSoccerReferee(RCJSoccerSupervisor):
             self.check_progress()
             self.check_robots_in_penalty_area()
         else:
-            self.ball_reset_timer -= TIME_STEP / 1000.0
-            self.draw_goal_sign()
+            self.ball_reset_timer = 0
+            #self.draw_goal_sign()
 
             # If the post-goal waiting period is over, reset the robots to
             # their starting positions
             if self.ball_reset_timer <= 0:
                 self.reset_positions()
                 self.ball_reset_timer = 0
-                self.hide_goal_sign()
+                #self.hide_goal_sign()
                 self.kickoff(self.team_to_kickoff)
 
         return True
