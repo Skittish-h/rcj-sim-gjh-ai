@@ -96,11 +96,11 @@ class ourEnv(gym.Env):
             penalty_area_allowed_time=15,
             penalty_area_reset_after=2,
         )
-    def step(self):
-
+    def step(self, action):
         isdone = False
         self.referee.step(TIME_STEP)
-        self.referee.emit_positions()
+        self.referee.emit_positions(actions)
+        #print(self.referee.score_yellow, self.referee.score_blue)
         isdone = self.referee.tick()
         return object(), 0, isdone, {}
     def render(self):
@@ -119,11 +119,11 @@ env = ourEnv()
 
 while 1:
     env.reset()
-    SIM_STEPS = 1000
+    SIM_STEPS = 100000
 
     for i in range(SIM_STEPS):
         #print(i)
-        env.step()
+        env.step(0)
     
     
 

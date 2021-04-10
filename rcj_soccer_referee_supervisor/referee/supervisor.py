@@ -277,6 +277,7 @@ class RCJSoccerSupervisor(Supervisor):
         robot_rotation: dict,
         robot_translation: dict,
         ball_translation: list,
+        actions
     ):
         """ Take the positions and rotations of the robots and the ball and pack
         them into a single packet that can be send to all robots in the game.
@@ -311,19 +312,20 @@ class RCJSoccerSupervisor(Supervisor):
 
         data.append(ball_translation[0])
         data.append(ball_translation[2])
-
+        print(data)
         # Add Notification if the goal is scored and we are waiting for kickoff
         # The value is True or False
         data.append(self.ball_reset_timer > 0)
 
         return struct.pack(struct_fmt, *data)
 
-    def emit_positions(self):
+    def emit_positions(self, actions):
         self._update_positions()
 
         packet = self._pack_packet(self.robot_rotation,
                                    self.robot_translation,
-                                   self.ball_translation)
+                                   self.ball_translation,
+                                   actions)
 
         self.emitter.send(packet)
 
