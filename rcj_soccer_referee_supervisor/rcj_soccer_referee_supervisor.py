@@ -1,6 +1,7 @@
 import logging
 import os
 import gym
+import numpy as np
 from time import sleep
 from math import ceil
 from datetime import datetime
@@ -56,30 +57,6 @@ output_prefix = output_path(
 )
 reflog_path = output_prefix.with_suffix('.jsonl')
 
-# referee = RCJSoccerReferee(
-#     match_time=MATCH_TIME,
-#     progress_check_steps=ceil(15/(TIME_STEP/1000.0)),
-#     progress_check_threshold=0.5,
-#     ball_progress_check_steps=ceil(10/(TIME_STEP/1000.0)),
-#     ball_progress_check_threshold=0.5,
-#     team_name_blue=TEAM_BLUE,
-#     team_name_yellow=TEAM_YELLOW,
-#     initial_score_blue=TEAM_BLUE_INITIAL_SCORE,
-#     initial_score_yellow=TEAM_YELLOW_INITIAL_SCORE,
-#     penalty_area_allowed_time=15,
-#     penalty_area_reset_after=2,
-# )
-
-# if automatic_mode:
-#     referee.simulationSetMode(referee.SIMULATION_MODE_FAST)
-#     for recorder in recorders:
-#         recorder.start_recording()
-
-# referee.add_event_subscriber(JSONLoggerHandler(reflog_path))
-# referee.add_event_subscriber(DrawMessageHandler())
-
-# referee.kickoff()
-
 class ourEnv(gym.Env):
     def __init__(self):
         super(ourEnv, self).__init__()
@@ -96,46 +73,46 @@ class ourEnv(gym.Env):
             penalty_area_allowed_time=15,
             penalty_area_reset_after=2,
         )
+        #since reset starts the same position, and I'm too lazy to provide a new observation...
+        self.initial_state = np.array([ 
+            3.56142833e-01, 5.62032341e-01, -4.99761261e-01,  4.47501229e-01,
+            -5.14661245e-01, -4.99761261e-01,  4.22284228e-01, -2.39233253e-03,
+            -4.99761261e-01, -2.93180141e-01, -5.35946988e-01,  4.99761261e-01,
+            -3.23186305e-01,  5.31913584e-01,  4.99761261e-01, -1.25000000e-01,
+            -4.74075686e-09,  4.99761261e-01,  0.00000000e+00,  0.00000000e+00
+        ])
+
     def step(self, action):
         isdone = False
         self.referee.step(TIME_STEP)
-        self.referee.emit_positions(actions)
-        #print(self.referee.score_yellow, self.referee.score_blue)
+        state = self.referee.emit_positions(action)
+        #print(state)
+
         isdone = self.referee.tick()
-        return object(), 0, isdone, {}
+        return state, 0, isdone, {}
     def render(self):
         pass
 
     def reset(self):
+
         self.referee.simulationResetPhysics()
-        #self.referee.add_event_subscriber(JSONLoggerHandler(reflog_path))
-        #self.referee.add_event_subscriber(DrawMessageHandler())
+
+
         self.referee.reset_positions()
         self.referee.kickoff()
         
-        return object()
+
+        return self.initial_state
     
 env = ourEnv()
 
 while 1:
     env.reset()
-    SIM_STEPS = 100000
-
+    SIM_STEPS = 1000
+    print("NEW ENV")
     for i in range(SIM_STEPS):
         #print(i)
-        env.step(0)
+        sampl = np.random.uniform(low=-1.0, high=1.0, size=(6,))
+        env.step(sampl)
     
     
-
-# # The "event" loop for the referee
-# while referee.step(TIME_STEP) != -1:
-#     referee.emit_positions()
-    
-#     # If the tick does not return True, the match has ended and the event loop
-#     # can stop
-#     if not referee.tick():
-#         break
-
-# # When end of match, pause simulator immediately
-# referee.simulationSetMode(referee.SIMULATION_MODE_PAUSE)
-

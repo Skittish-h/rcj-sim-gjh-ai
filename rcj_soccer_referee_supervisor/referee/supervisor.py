@@ -1,6 +1,7 @@
 import math
 import struct
 import random
+import numpy as np
 
 from typing import List, Tuple
 
@@ -58,7 +59,7 @@ class RCJSoccerSupervisor(Supervisor):
         self.event_messages_to_draw: List[Tuple[int, str]] = []
 
         self.eventer = Eventer()
-
+        self.normalizing_consts = np.array([0.8, 0.65, 3.1415, 0.8, 0.65, 3.1415, 0.8, 0.65, 3.1415, 0.8, 0.65, 3.1415, 0.8, 0.65, 3.1415, 0.8, 0.65, 3.1415, 0.8, 0.65])
         self.team_name_blue = team_name_blue
         self.team_name_yellow = team_name_yellow
 
@@ -271,12 +272,26 @@ class RCJSoccerSupervisor(Supervisor):
             self.event_messages_to_draw.pop(0)
 
         self.event_messages_to_draw.append((self.time, message))
+    def _get_data(self):
+        data = []
+        for robot in ROBOT_NAMES:
+            data.append(self.robot_translation[robot][0])  # X
+            data.append(self.robot_translation[robot][2])  # Z
 
+            if self.robot_rotation[robot][1] > 0:
+                data.append(self.robot_rotation[robot][3])
+            else:
+                data.append(-self.robot_rotation[robot][3])
+
+        data.append(self.ball_translation[0])
+        data.append(self.ball_translation[2])
+        return data
     def _pack_packet(
         self,
         robot_rotation: dict,
         robot_translation: dict,
         ball_translation: list,
+        data,
         actions
     ):
         """ Take the positions and rotations of the robots and the ball and pack
@@ -288,6 +303,7 @@ class RCJSoccerSupervisor(Supervisor):
             robot_translation (dict): a mapping between the robot name and its
                                       position on the field
             ball_translation (list): the position of the ball on the field
+            actions (object): numpy array for system actions
 
         Returns:
             str: the packed packet.
@@ -298,36 +314,46 @@ class RCJSoccerSupervisor(Supervisor):
         # X, Z and rotation for each robot
         # plus X and Z for ball
         # plus True/False telling whether the goal was scored
-        struct_fmt = 'ddd' * len(robot_translation) + 'dd' + '?'
+        struct_fmt = 'ddd' * len(robot_translation) + 'dd' + '?' + "dddddd" #last Ds are for actions
 
-        data = []
-        for robot in ROBOT_NAMES:
-            data.append(robot_translation[robot][0])  # X
-            data.append(robot_translation[robot][2])  # Z
-
-            if robot_rotation[robot][1] > 0:
-                data.append(robot_rotation[robot][3])
-            else:
-                data.append(-robot_rotation[robot][3])
-
-        data.append(ball_translation[0])
-        data.append(ball_translation[2])
-        print(data)
         # Add Notification if the goal is scored and we are waiting for kickoff
         # The value is True or False
         data.append(self.ball_reset_timer > 0)
-
+        data += actions.tolist()
         return struct.pack(struct_fmt, *data)
+    
+    #function that returns data as normalized numpy array for GYM processing
+    def normalize_array(self, data):
+        #numpy array
+        arr = np.array(data)
+        #divide by our consts to get normalized values from 1 to -1
+        return np.divide(arr, self.normalizing_consts)
 
+    #emits robots position
     def emit_positions(self, actions):
         self._update_positions()
-
+        #get data
+        data = self._get_data()
+        #pack our packet
         packet = self._pack_packet(self.robot_rotation,
                                    self.robot_translation,
                                    self.ball_translation,
+                                   data,
                                    actions)
-
+        #send our packet
         self.emitter.send(packet)
+
+        #pop is goal value and actions
+        data.pop(len(data)-1)
+        data.pop(len(data)-1)
+        data.pop(len(data)-1)
+        data.pop(len(data)-1)
+        data.pop(len(data)-1)
+        data.pop(len(data)-1)
+        data.pop(len(data)-1)
+        #return state for Gym
+        return self.normalize_array(data)
+
 
     def reset_positions(self):
         """

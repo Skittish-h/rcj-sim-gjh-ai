@@ -47,7 +47,8 @@ class RCJSoccerRobot:
         # X, Z and rotation for each robot
         # plus X and Z for ball
         # plus True/False telling whether the goal was scored
-        struct_fmt = 'ddd' * N_ROBOTS + 'dd' + '?'
+        # plus actions
+        struct_fmt = 'ddd' * N_ROBOTS + 'dd' + '?' + 'dddddd'
 
         unpacked = struct.unpack(struct_fmt, packet)
 

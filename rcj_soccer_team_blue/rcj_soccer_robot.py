@@ -30,24 +30,28 @@ class RCJSoccerRobot:
         self.left_motor.setVelocity(0.0)
         self.right_motor.setVelocity(0.0)
 
-    def parse_supervisor_msg(self, packet: str) -> dict:
+    def parse_supervisor_msg(self, packet: str) ->  tuple:
         """Parse message received from supervisor
 
         Returns:
-            dict: Location info about each robot and the ball.
+            tuple: Location info about each robot and the ball, and the actions robots should take
             Example:
-                {
+                ({
                     'B1': {'x': 0.0, 'y': 0.2, 'orientation': 1},
                     'B2': {'x': 0.4, 'y': -0.2, 'orientation': 1},
                     ...
                     'ball': {'x': -0.7, 'y': 0.3},
                     'waiting_for_kickoff': False,
-                }
+                },
+                [
+                    0.0, 0.0, 0.1, -0.1, 1.0, -0.5
+                ])
         """
         # X, Z and rotation for each robot
         # plus X and Z for ball
         # plus True/False telling whether the goal was scored
-        struct_fmt = 'ddd' * N_ROBOTS + 'dd' + '?'
+        # plus actions
+        struct_fmt = 'ddd' * N_ROBOTS + 'dd' + '?' + 'dddddd'
 
         unpacked = struct.unpack(struct_fmt, packet)
 
@@ -66,13 +70,15 @@ class RCJSoccerRobot:
 
         waiting_for_kickoff_data_index = ball_data_index + 2
         data["waiting_for_kickoff"] = unpacked[waiting_for_kickoff_data_index]
-        return data
+        actions = list(unpacked[-6:])
+        
+        return data, actions
 
-    def get_new_data(self) -> dict:
+    def get_new_data(self) -> tuple:
         """Read new data from supervisor
 
         Returns:
-            dict: See `parse_supervisor_msg` method
+            tuple: See `parse_supervisor_msg` method
         """
         packet = self.receiver.getData()
         self.receiver.nextPacket()
