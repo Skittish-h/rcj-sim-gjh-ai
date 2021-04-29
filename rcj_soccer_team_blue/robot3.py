@@ -13,7 +13,9 @@ class MyRobot3(RCJSoccerRobot):
         while self.robot.step(TIME_STEP) != -1:
             if self.is_new_data():
                 #get desired actions
-                _, actions = self.get_new_data()
+                _, actions = data = self.get_new_data()
+                while self.is_new_data():
+                    _, actions = self.get_new_data()
 
                 #since this is robot 3 actions are in indexes 4, 5
                 #multiply by 10 to obtain values from -10 to 10

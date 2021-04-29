@@ -94,8 +94,9 @@ class ourEnv(gym.Env):
         pass
 
     def reset(self):
-
-        self.referee.simulationResetPhysics()
+        print(self.referee.score_yellow, self.referee.score_blue)
+        #self.referee.simulationReset()
+        #self.referee.simulationResetPhysics()
 
 
         self.referee.reset_positions()
