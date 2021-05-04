@@ -19,8 +19,8 @@ class MyRobot2(RCJSoccerRobot):
 
                 #since this is robot 2 actions are in indexes 2,3
                 #also we multiply by 10 to obtain values from -10 to 10
-                left_speed = actions[0] * 10
-                right_speed = actions[1] * 10
+                left_speed = actions[2] * 10
+                right_speed = actions[3] * 10
 
 
                 # Set the speed to motors

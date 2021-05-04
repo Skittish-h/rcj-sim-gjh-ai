@@ -1,7 +1,7 @@
 import logging
 import os
 import math
-os.environ["CUDA_VISIBLE_DEVICES"] = "1"
+os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
 import gym
 from gym import spaces
 import numpy as np
@@ -13,11 +13,7 @@ from pathlib import Path, PosixPath
 import matplotlib.pyplot as plt
 
 from stable_baselines3.common.callbacks import BaseCallback
-from stable_baselines3 import SAC
-from stable_baselines3 import A2C
 from stable_baselines3 import TD3
-
-from stable_baselines3.common.env_checker import check_env
 
 from referee.consts import DEFAULT_MATCH_TIME, TIME_STEP
 from referee.event_handlers import JSONLoggerHandler, DrawMessageHandler
@@ -100,7 +96,7 @@ class ourEnv(gym.Env):
             -5.14661245e-01, math.sin(-4.99761261e-01), math.cos(-4.99761261e-01),  4.22284228e-01, -2.39233253e-03,
             math.sin(-4.99761261e-01), math.cos(-4.99761261e-01), -2.93180141e-01, -5.35946988e-01,  math.sin(-4.99761261e-01), math.cos(-4.99761261e-01),
             -3.23186305e-01,  5.31913584e-01,  math.sin(-4.99761261e-01), math.cos(-4.99761261e-01), -1.25000000e-01,
-            -4.74075686e-09,  math.sin(-4.99761261e-01), math.cos(-4.99761261e-01),  0.00000000e+00,  0.00000000e+0, 0, 0
+            -4.74075686e-09,  math.sin(-4.99761261e-01), math.cos(-4.99761261e-01),  0.00000000e+00,  0.00000000e+00, 0,0
         ])
         self.action_space = spaces.Box(low=-1, high=1, shape=(6, ), dtype=np.float32)
         self.observation_space = spaces.Box(low=-1, high=1, shape=(28, ), dtype=np.float32)
@@ -114,6 +110,7 @@ class ourEnv(gym.Env):
         state = self.referee.emit_positions(np.clip(action, -1, 1))
         self.SIM_STEPS-= 1
         isdone = self.referee.tick()
+        
         return state, self.get_reward(), self.SIM_STEPS<1, {}
     
     def get_reward(self):
@@ -134,7 +131,7 @@ class ourEnv(gym.Env):
         dst1 = sqrt((x-1)**2 + (y)**2)
         dst2 = sqrt((x+1)**2 + (y)**2)
         dst_offset = (dst1-dst2)*0.01
-        return reward + dst_offset
+        return reward
 
     def render(self):
         pass
@@ -151,10 +148,6 @@ class ourEnv(gym.Env):
         
 
         return self.initial_state
-log_dir = r"C:\Users\SkittishHardware\Documents\AIFootball\rcj-soccer-sim-communication - Copy\controllers\rcj_soccer_referee_supervisor"
-
-env = ourEnv()
-env = Monitor(env, log_dir)
 
 def moving_average(values, window):
     """
@@ -185,12 +178,20 @@ def plot_results(log_folder, title='Learning Curve'):
     plt.title(title + " Smoothed")
     plt.show()
 
+log_dir = r"C:\Users\SkittishHardware\Documents\AIFootball\rcj-soccer-sim-communication - Copy\controllers\rcj_soccer_referee_supervisor"
+
+env = ourEnv()
+#env = Monitor(env, log_dir)
+
 
 
 n_actions = env.action_space.shape[-1]
+action_noise = NormalActionNoise(mean=np.zeros(n_actions), sigma=0.1 * np.ones(n_actions))
 
-model = PPO("MlpPolicy", env, verbose=1, )
-model.learn(total_timesteps=10000000)
-model.save("a2c_10m_non_crafted")
-plot_results(log_dir)
+model = TD3("MlpPolicy", env, action_noise=action_noise, verbose=1)
+model.learn(total_timesteps=100000)
+
+# model = PPO("MlpPolicy", env, verbose=1)
+# model.learn(total_timesteps=10000000)
+plot_results("tmp/")
 

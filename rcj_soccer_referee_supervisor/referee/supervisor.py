@@ -52,6 +52,8 @@ class RCJSoccerSupervisor(Supervisor):
         self.post_goal_wait_time = post_goal_wait_time
         self.initial_position_noise = initial_position_noise
 
+        self.last_ball_X = 0
+        self.last_ball_Y = 0
         self.time = match_time
 
         # Event message queue to be drawn
@@ -59,7 +61,7 @@ class RCJSoccerSupervisor(Supervisor):
         self.event_messages_to_draw: List[Tuple[int, str]] = []
 
         self.eventer = Eventer()
-        self.normalizing_consts = np.array([0.8, 0.65, 3.1415, 0.8, 0.65, 3.1415, 0.8, 0.65, 3.1415, 0.8, 0.65, 3.1415, 0.8, 0.65, 3.1415, 0.8, 0.65, 3.1415, 0.8, 0.65])
+        self.normalizing_consts = np.array([0.8, -0.65, 1, 1, 0.8, -0.65, 1, 1, 0.8, -0.65, 1, 1, 0.8, -0.65, 1, 1, 0.8, -0.65, 1, 1, 0.8, -0.65, 1, 1, 0.8, -0.65, 1, 1])
         self.team_name_blue = team_name_blue
         self.team_name_yellow = team_name_yellow
 
@@ -272,20 +274,42 @@ class RCJSoccerSupervisor(Supervisor):
             self.event_messages_to_draw.pop(0)
 
         self.event_messages_to_draw.append((self.time, message))
-    def _get_data(self):
+
+    def _get_movement_vector(self):
+        ball_x = self.ball_translation[0]*0.8
+        ball_y = self.ball_translation[2]*-0.65
+        ret_val = ball_x-self.last_ball_X, ball_y - self.last_ball_Y
+        self.last_ball_Y = ball_y
+        self.last_ball_X = ball_x
+
+        return ret_val
+    def _get_data(self, output_angle=True):
         data = []
         for robot in ROBOT_NAMES:
             data.append(self.robot_translation[robot][0])  # X
             data.append(self.robot_translation[robot][2])  # Z
-
+            my_rotation = 0
             if self.robot_rotation[robot][1] > 0:
-                data.append(self.robot_rotation[robot][3])
+                my_rotation = self.robot_rotation[robot][3]
             else:
-                data.append(-self.robot_rotation[robot][3])
-
+                my_rotation = -self.robot_rotation[robot][3]
+            if output_angle==False:
+                data.append(math.sin(my_rotation))
+                data.append(-math.cos(my_rotation))
+            else:
+                data.append(my_rotation)
+                
+        
         data.append(self.ball_translation[0])
         data.append(self.ball_translation[2])
+        if not output_angle:
+            x, y = self._get_movement_vector()
+            data.append(x)
+            data.append(y)
+
+
         return data
+    
     def _pack_packet(
         self,
         robot_rotation: dict,
@@ -344,15 +368,9 @@ class RCJSoccerSupervisor(Supervisor):
         self.emitter.send(packet)
 
         #pop is goal value and actions
-        data.pop(len(data)-1)
-        data.pop(len(data)-1)
-        data.pop(len(data)-1)
-        data.pop(len(data)-1)
-        data.pop(len(data)-1)
-        data.pop(len(data)-1)
-        data.pop(len(data)-1)
+        gym_data = self._get_data(output_angle=False)
         #return state for Gym
-        return self.normalize_array(data)
+        return self.normalize_array(gym_data)
 
 
     def reset_positions(self):

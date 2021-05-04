@@ -22,7 +22,6 @@ class MyRobot3(RCJSoccerRobot):
                 left_speed = actions[4] * 10
                 right_speed = actions[5] * 10
 
-
                 # Set the speed to motors
                 self.left_motor.setVelocity(left_speed)
                 self.right_motor.setVelocity(right_speed)
